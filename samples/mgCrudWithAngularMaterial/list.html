@@ -1,6 +1,6 @@
 <div>
     Lista
-    <mg-ajax mg-path="/data.json" mg-options="mgIndex" mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
+    <mg-ajax mg-path="/data.json" mg-options="mgIndex" mg-override=”{init:'index.filter={page:0,recordsPerPage:15}'}” >
         <div ng-repeat="item in model">
             {{item.name}}
         </div>
