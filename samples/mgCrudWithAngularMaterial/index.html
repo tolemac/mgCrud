@@ -33,6 +33,9 @@
 
         <main flex>
             <ng-view></ng-view>
+            <mg-ajax mg-path="/data.json" mg-options="mgIndex" mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
+            </mg-ajax>
+            
         </main>
 
     </div>

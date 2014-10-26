@@ -700,7 +700,7 @@
             function createShortMethodWithData() {
                 forEach(arguments, function (name) {
                     service[name] = function (config, before, sucess, error,transform) {
-                        return function (path, data, self) {
+                        return function (path, self, data) {
                             runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error,transform, self);
                         };
                     };
