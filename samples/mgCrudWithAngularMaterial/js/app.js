@@ -4,7 +4,7 @@
     window.myModule = window.angular.module('mgCrudSampleModule', ['ngRoute', 'mgCrud', "ngMaterial"]);
 
     window.myModule.config(function ($routeProvider, $locationProvider) {
-        $locationProvider.html5Mode(true);
+        //$locationProvider.html5Mode(true);
         $routeProvider
             .when("/", {templateUrl: "list.html"})
             .when("/edit/:id", {templateUrl: "edit.html"})

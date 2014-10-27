@@ -1,1 +1,27 @@
-<div>delete</div>
+<div>
+    <h1>Deleting this person</h1>
+    <mg-ajax path="/api/people/{{edit.params.id}}" options="mgEdit">
+        <mg-ajax path="/api/people/{{edit.params.id}}" options="mgDelete">
+            <md-content>
+                <md-card flex>
+                    <div layout="horizontal">
+                        <div flex>
+                            <form>
+                                <h2>{{edit.model.name}}</h2>                                
+                                <md-text-float label="Name" disabled ng-model="edit.model.name" class="long"> </md-text-float>
+                                <div layout="horizontal">
+                                    <md-text-float label="Company" disabled ng-model="edit.model.company"></md-text-float>
+                                    <md-text-float label="eMail" disabled ng-model="edit.model.email"></md-text-float>
+                                </div>
+                            </form>
+                        </div>
+                        <div layout="vertical" layout-align="end">
+                            <md-button class="md-theme-green" ng-click="delete.accept()">Delete</md-button>
+                            <md-button class="md-theme-red" ng-click="delete.close()">Cancel</md-button>
+                        </div>
+                    </div>
+                </md-card>                
+            </md-content>
+        </mg-ajax>
+    </mg-ajax>
+</div>

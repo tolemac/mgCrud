@@ -12,10 +12,14 @@ aside{
     color: white;    
 }
 
+button a  {
+    text-decoration: none;
+    color: white;    
+}
+
 aside a {
     text-decoration: none;
     color: white;    
-    
 }
 
 aside li {
@@ -25,6 +29,34 @@ aside li {
 }
 
 footer {
-    text-align: right;
     padding-right: 1em;
+}
+
+main {
+    overflow-y: auto;
+}
+
+md-content {
+    padding: 1em;
+}
+
+md-item-content {
+    cursor: pointer;    
+}
+
+md-item-content md-card:hover {
+    background-color: #afafaf;
+}
+
+md-input-group {
+    margin-left: 1em;
+}
+
+md-input-group.long > input {
+    width: 23.5em;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;    
 }

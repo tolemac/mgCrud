@@ -1,8 +1,50 @@
 <div>
-    Lista
-    <mg-ajax mg-path="/data.json" mg-options="mgIndex" mg-override=”{init:'index.filter={page:0,recordsPerPage:15}'}”>
-        <div ng-repeat="item in index.model">
-            {{item.name}}
-        </div>
+    <h1>People list</h1>
+    <mg-ajax path="/api/people" options="mgIndex" override="{init:'index.filter={page:0,recordsPerPage:5}'}">        
+        <md-content>
+            <div id="list-header" layout="horizontal" layout-align="bottom">
+                <div flex>
+                </div>
+                <div layout="horizontal">
+                    <div layout="vertical">
+                        <div layout="horizontal">
+                            <md-button ng-click="index.filter.page=0;index.accept();" ng-disabled="index.filter.page==0" class="md-button-raised md-theme-green">First page</md-button>
+                            <md-button ng-click="index.previousPage();" ng-disabled="index.filter.page <= 0" class="md-button-raised md-theme-red">Prior page</md-button>
+                            <md-button ng-click="index.nextPage();" ng-disabled="index.model.length != index.filter.recordsPerPage" class="md-button-raised md-theme-light-blue">Next page</md-button>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <md-list>
+                <md-item ng-repeat="item in index.model">
+                    
+                        <md-item-content>
+                            <md-card  flex>
+                                <div layout="vertical">
+                                    <div layout="horizontal">
+                                        <div flex>{{item.name}}</div>
+                                        <div>{{item.email}}</div>
+                                    </div>
+                                    <div layout="horizontal">
+                                        <span flex>{{item.company}}</span>
+                                        <span>
+                                            <a ng-href="#/edit/{{item.id}}">Edit</a>
+                                            <a ng-href="#/delete/{{item.id}}">Delete</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </md-card>                            
+                        </md-item-content>                    
+                    
+                </md-item>
+            </md-list>
+            <div layout="horizontal">
+                <div flex></div>
+                <md-card>
+                    <div>Current page: {{index.filter.page + 1}}</div>
+                </md-card>
+            </div>
+
+        </md-content>
     </mg-ajax>
 </div>

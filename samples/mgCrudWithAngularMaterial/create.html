@@ -1,1 +1,27 @@
-<div>Create</div>
+<div>
+    <h1>Create a new person</h1>
+    
+        <mg-ajax path="http://mgcrudserver.azurewebsites.net/api/people" options="mgCreate">
+            <md-content>            
+                <md-card flex>
+                    <div layout="horizontal">
+                        <div flex>
+                            <form>
+                                <h2>{{create.model.name}}</h2>
+                                <md-text-float label="Name" ng-model="create.model.name" class="long"> </md-text-float>
+                                <div layout="horizontal">
+                                    <md-text-float label="Company" ng-model="create.model.company"></md-text-float>
+                                    <md-text-float label="eMail" ng-model="create.model.email"></md-text-float>
+                                </div>
+                            </form>
+                        </div>
+                        <div layout="vertical" layout-align="end">
+                            <md-button class="md-theme-green" ng-click="create.accept()">Create</md-button>
+                            <md-button class="md-theme-red" ng-click="create.close()">Cancel</md-button>
+                        </div>
+                    </div>
+                </md-card>                
+            </md-content>
+        </mg-ajax>
+    
+</div>
