@@ -7,29 +7,17 @@
     <base href="/">
     <title>mg-crud sample</title>
 </head>
-<body ng-app="mgCrudSampleModule" layout="vertical" layout-fill class="layout-demo full-layout-demo">
+<body ng-app="mgCrudSampleModule" layout="vertical" layout-fill>
     
     <header>
         <md-toolbar class="md-theme-dark">
             <div layout="horizontal">
-                <span><a href="https://github.com/MagicCrudAngular/mgCrud">mg-crud</a> sample!</span>
+                <span flex><a href="#/">mg-crud sample!</a></span><a ng-href="#/about">About</a>
             </div>
         </md-toolbar>
     </header>
 
     <div flex layout="vertical" layout-sm="horizontal">
-
-        <aside flex-sm="33" flex-md="20">
-            <ul>
-                <li>
-                    <a href="/list">People</a>
-                    <ul>
-                        <li><a href="#/list">List</a></li>
-                        <li><a href="#/create">Add new ...</a><br></li>
-                    </ul>
-                </li>
-            </ul>
-        </aside>
 
         <main flex>
             <ng-view></ng-view>
@@ -37,16 +25,17 @@
 
     </div>
 
-    <footer class="md-theme-dark">
-        <div layout="horizontal">
-            <div flex>
-                <a href="http://github.com/MagicCrudAngular/mgCrud">Visit Magic Crud Angular (mgCrud) repo in GitHub</a> by 
-                <a href="http://twitter.com/XaviPaper">@XaviPaper</a> and 
-                <a href="http://twitter.com/_PedroHurtado">@_PedroHurtado</a>
+    <footer class="md-theme-dark" block-md block-lg hide>
+        <div layout="horizontal" layout-align="end">
+            <div flex layout="vertical">
+                <a href="http://github.com/MagicCrudAngular/mgCrud">Visit Magic Crud Angular (mgCrud) repo in GitHub</a>
+                <a href="http://twitter.com/XaviPaper">by @XaviPaper</a>
+                <a href="http://twitter.com/_PedroHurtado">and @_PedroHurtado</a>
             </div>
-            <div>mgCrud sample by <a href="http://twitter.com/tolemac_jros">@tolemac_jros</a> using <a href="https://material.angularjs.org/#/">Angular Material Design</a></div>
+            <div layout="vertical" layout-align="end">
+                <div>mgCrud sample by <a href="http://twitter.com/tolemac_jros">@tolemac_jros</a> using <a href="https://material.angularjs.org/#/">Angular Material Design</a></div>
+            </div>
         </div>
-        
     </footer>
     
 

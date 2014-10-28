@@ -1,9 +1,10 @@
 <div>
-    <h1>Create a new person</h1>
-    
-        <mg-ajax path="http://mgcrudserver.azurewebsites.net/api/people" options="mgCreate">
-            <md-content>            
-                <md-card flex>
+    <mg-ajax path="/people" options="mgCreate">
+        <md-content>
+            <md-toolbar class="filter md-theme-green">
+                <h2>Create a new person</h2>
+            </md-toolbar>
+            <div class="md-whiteframe-z1">
                     <div layout="horizontal">
                         <div flex>
                             <form>
@@ -20,8 +21,8 @@
                             <md-button class="md-theme-red" ng-click="create.close()">Cancel</md-button>
                         </div>
                     </div>
-                </md-card>                
-            </md-content>
-        </mg-ajax>
-    
+                <br/>
+            </div>
+        </md-content>
+    </mg-ajax>
 </div>

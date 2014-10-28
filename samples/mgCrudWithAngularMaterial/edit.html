@@ -1,9 +1,11 @@
 <div>
-    <h1>Edit the person details</h1>
-    <mg-ajax path="/api/people/{{edit.params.id}}" options="mgEdit">
-        <mg-ajax path="/api/people/{{edit.params.id}}" options="mgPut">
+    <mg-ajax path="/people/{{edit.params.id}}" options="mgEdit">
+        <mg-ajax path="/people/{{edit.params.id}}" options="mgPut">
             <md-content>
-                <md-card flex>
+                <md-toolbar class="filter md-theme-green">
+                    <h2>Edit the person details</h2>
+                </md-toolbar>
+                <div class="md-whiteframe-z1">
                     <div layout="horizontal">
                         <div flex>
                             <form>
@@ -20,7 +22,7 @@
                             <md-button class="md-theme-red" ng-click="put.close()">Cancel</md-button>
                         </div>
                     </div>
-                </md-card>
+                </div>
             </md-content>
         </mg-ajax>
     </mg-ajax>

@@ -94,7 +94,24 @@
         }
 
         function restoreCache() {
-            var x = factory.cacheKey
+            if (!factory.cacheService)
+                return;
+            var cacheData = factory.cacheService.get(factory.cacheKey);
+            if (cacheData) {
+                angular.forEach(factory.cache, function(cacheItem) {
+                    self[cacheItem] = cacheData[cacheItem];
+                });
+            }
+        }
+
+        function saveCache() {
+            if (!factory.cacheService)
+                return;
+            var cacheObj = {};
+            angular.forEach(factory.cache, function (cacheItem) {
+                cacheObj[cacheItem] = self[cacheItem];
+            });
+            factory.cacheService.put(factory.cacheKey, cacheObj);
         }
 
         function processRouteParams() {
@@ -123,7 +140,13 @@
                 checkPath(fnauto);
             }
         }
-
+        
+        function setChangeRouteStartCallback() {
+            scope.$on('$routeChangeStart', function (next, current) {
+                saveCache();
+            });
+        }
+        
         assingSelftToFactory();
         createModel();
         setPartialModel();
@@ -133,7 +156,7 @@
         processRouteParams();
         restoreCache();
         runAuto();
-
+        setChangeRouteStartCallback();
     }
 
     function mgAjax() {

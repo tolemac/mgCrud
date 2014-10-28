@@ -1,0 +1,55 @@
+﻿<md-content>
+    <md-toolbar class="md-theme-green">
+        <div class="md-toolbar-tools">
+            <span flex>Magic Crud Angular (mgCrud)</span>
+        </div>
+    </md-toolbar>
+    <div class="md-whiteframe-z1">
+        <div layout="vertical">
+            <p>The main goal of this module is to show how to made all calls to RESTful services we need in a declarative way with 7Kb and less than 600 lines of JavaScript thanks to the power of Angularjs. This allow you to develop 98% of your app without write any controller or service, in other words without javascript code. We like ngResource and restangular modules, but our goal is simply for convincing you that with Angular Magic you can avoid to write JavaScript in a very high percentage of your application.</p>
+            <p>
+                Visit our <a href="http://github.com/MagicCrudAngular/mgCrud">repo at GitHub</a> for more information and get started!!
+            </p>
+            <p>Only the follow code is written in this sample application: </p>
+            <md-card>
+                <pre>
+(function (window) {
+    "use strict";
+    
+    window.myModule = window.angular.module('mgCrudSampleModule', ['ngRoute', 'mgCrud', "ngMaterial"]);
+    window.myModule.config(function ($routeProvider, $locationProvider) {
+        //$locationProvider.html5Mode(true);
+        $routeProvider
+            .when("/", {templateUrl: "list.html"})
+            .when("/edit/:id", {templateUrl: "edit.html"})
+            .when("/create", {templateUrl: "create.html"})
+            .when("/delete/:id", { templateUrl: "delete.html" })
+            .when("/about", { templateUrl: "about.html" })
+            .otherwise("/");
+    });
+    
+    window.myModule.config(function (mgHttpProvider) {
+        mgHttpProvider.setDefaultConfig({ url: 'http://mgcrudserver.azurewebsites.net/api' }); //'/api' }); //
+    });
+    jrPeopleIndex.$inject = ['mgIndex'];
+    function jrPeopleIndex(mgIndex) {
+        return angular.extend(mgIndex, {
+            init: 'index.filter={page:0,recordsPerPage:4}'
+        });
+    }
+    window.myModule.factory('jrPeopleIndex', jrPeopleIndex);
+}(window));
+                </pre>
+            </md-card>
+
+            <div layout="horizontal" layout-align="end">
+                <div flex layout="vertical">
+                    <span>by <a href="http://twitter.com/XaviPaper">@XaviPaper</a></span>
+                    <span>and <a href="http://twitter.com/_PedroHurtado">@_PedroHurtado</a></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</md-content>

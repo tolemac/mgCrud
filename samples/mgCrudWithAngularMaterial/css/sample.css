@@ -60,3 +60,11 @@ footer a {
     text-decoration: none;
     color: white;    
 }
+
+.filter {
+    padding: 1em;
+}
+
+.md-whiteframe-z1 {
+    padding: 1em;
+}
