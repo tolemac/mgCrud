@@ -38,6 +38,12 @@
             isFunction = angular.isFunction,
             isEmpty = magicCrudAngular.isEmpty;
 
+        this.setSaveCache = function (value){
+            factory.saveCache = value;
+        }
+        
+        this.setSaveCache(false);
+        
         function resolveSelf() {
             var obj;
             if (factory.as) {
@@ -104,9 +110,10 @@
             }
         }
 
-        function saveCache() {
-            if (!factory.cacheService)
-                return;
+        function saveCache() {            
+            if (!factory.cacheService || !factory.saveCache)
+                return;           
+                
             var cacheObj = {};
             angular.forEach(factory.cache, function (cacheItem) {
                 cacheObj[cacheItem] = self[cacheItem];
@@ -171,9 +178,23 @@
             controller: controller
         };
     }
-
     module.directive('mgAjax', mgAjax);
 
+    
+    function mgCache() {
+
+        return {
+            restrict: 'A',            
+            require: 'mgAjax',
+            link: function(scope, element, attrs, mgAjaxCtrl){
+                mgAjaxCtrl.setSaveCache(true);                
+            }
+            
+        };
+    }
+    module.directive('mgCache', mgCache);
+    
+    
 })(angular.module('mgCrud'));
 (function (module, undefined) {
 
@@ -215,8 +236,18 @@
 
     mgCommandCreate.$inject = ['mgAcceptFactory', 'mgHistoryFactory']
     function mgCommandCreate(mgAcceptFactory, history) {
+        function accept(factory)
+        {
+            if (factory.cacheService)
+            {
+                factory.saveCache = false;
+                factory.cacheService.remove(factory.cacheKey);
+            }
+            
+            mgAcceptFactory.accept(factory);
+        }
         return {
-            accept: mgAcceptFactory.accept,
+            accept: accept,
             close: history.back
         }
     }
@@ -477,7 +508,7 @@
 (function (module, undefined) {
 
 
-    module.factory('mgPut', function () {
+    module.factory('mgPatch', function () {
         return {
             as: 'patch',
             init: 'patch.model=edit.model',
