@@ -38,11 +38,12 @@
             isFunction = angular.isFunction,
             isEmpty = magicCrudAngular.isEmpty;
 
-        this.setSaveCache = function (value){
-            factory.saveCache = value;
+        this.setSaveCacheOnRouteChange = function (value){
+            factory.cacheManager.saveCacheOnRouteChange = value;
         }
         
-        this.setSaveCache(false);
+        if (factory.cacheManager)
+            this.setSaveCacheOnRouteChange(false);
         
         function resolveSelf() {
             var obj;
@@ -100,25 +101,15 @@
         }
 
         function restoreCache() {
-            if (!factory.cacheService)
+            if (!factory.cacheService || !factory.cacheManager)
                 return;
-            var cacheData = factory.cacheService.get(factory.cacheKey);
-            if (cacheData) {
-                angular.forEach(factory.cache, function(cacheItem) {
-                    self[cacheItem] = cacheData[cacheItem];
-                });
-            }
+            factory.cacheManager.restoreCache.call(self, factory);
         }
 
         function saveCache() {            
-            if (!factory.cacheService || !factory.saveCache)
-                return;           
-                
-            var cacheObj = {};
-            angular.forEach(factory.cache, function (cacheItem) {
-                cacheObj[cacheItem] = self[cacheItem];
-            });
-            factory.cacheService.put(factory.cacheKey, cacheObj);
+            if (!factory.cacheService || !factory.cacheManager || !factory.cacheManager.saveCacheOnRouteChange)
+                return;
+            factory.cacheManager.saveCache.call(self, factory);
         }
 
         function processRouteParams() {
@@ -181,23 +172,52 @@
     module.directive('mgAjax', mgAjax);
 
     
-    function mgCache() {
+    function mgRouteCache() {
 
         return {
             restrict: 'A',            
             require: 'mgAjax',
             link: function(scope, element, attrs, mgAjaxCtrl){
-                mgAjaxCtrl.setSaveCache(true);                
+                mgAjaxCtrl.setSaveCacheOnRouteChange(true);                
             }
             
         };
     }
-    module.directive('mgCache', mgCache);
+    module.directive('mgRouteCache', mgRouteCache);
     
     
 })(angular.module('mgCrud'));
 (function (module, undefined) {
 
+    function mgCacheManager() {        
+        function saveCache(factory){            
+            var cacheObj = {};
+            var self = this;
+            angular.forEach(factory.cache, function (cacheItem) {
+                cacheObj[cacheItem] = self[cacheItem];
+            });
+            factory.cacheService.put(factory.cacheKey, cacheObj);
+        }
+        function restoreCache(factory){            
+            var cacheData = factory.cacheService.get(factory.cacheKey);
+            var self = this;
+            if (cacheData) {
+                angular.forEach(factory.cache, function(cacheItem) {
+                    self[cacheItem] = cacheData[cacheItem];
+                });
+            }
+        }
+        
+        return {
+            saveCacheOnRouteChange: true,
+            acceptClearCache: true,
+            closeSaveCache: false,
+            saveCache: saveCache,
+            restoreCache: restoreCache
+        };
+    }
+    module.factory('mgCacheManager', mgCacheManager);
+    
     mgCacheFactory.$inject = ['$cacheFactory'];
     function mgCacheFactory(cacheFactory) {
         var cache = cacheFactory('mgCache');
@@ -215,7 +235,7 @@
             }
         };
     }
-    module.factory('mgCacheFactory', mgCacheFactory);
+    module.factory('mgCacheFactory', mgCacheFactory);    
 
 })(angular.module('mgCrud'));
 
@@ -238,17 +258,25 @@
     function mgCommandCreate(mgAcceptFactory, history) {
         function accept(factory)
         {
-            if (factory.cacheService)
+            if (factory.cacheService && factory.cacheManager && factory.cacheManager.acceptClearCache)
             {
-                factory.saveCache = false;
+                factory.cacheManager.saveCacheOnRouteChange = false;
                 factory.cacheService.remove(factory.cacheKey);
             }
             
-            mgAcceptFactory.accept(factory);
+            mgAcceptFactory.accept.call(this, factory);
+        }
+        function close(factory)
+        {
+            if (factory.cacheService && factory.cacheManager && factory.cacheManager.acceptClearCache)
+            {
+                factory.cacheManager.saveCache.call(this, factory);
+            }
+            history.back();
         }
         return {
             accept: accept,
-            close: history.back
+            close: close
         }
     }
 
@@ -262,6 +290,7 @@
             method: 'post',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
+            cacheManager: 'mgCacheManager',
             cache: '["model"]',
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryCreate',
@@ -325,6 +354,7 @@
             method: 'get',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
+            cacheManager: 'mgCacheManager',
             cache: '["model"]',
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryIndex',
@@ -493,6 +523,7 @@
             method: 'query',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
+            cacheManager: 'mgCacheManager',
             cache: '["filter"]',
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryIndex',
@@ -551,7 +582,7 @@
         function resolveFactory(factory, path,transform) {
             var forEach = angular.forEach, extend = angular.extend, newFactory = {}, DEFAULT_TRANSFORM = 'mgDefaultTransform';
             //Services, factories, provides,values and constant
-            forEach(['config', 'before', 'success', 'error', 'cmd', 'auto', 'service', 'cacheService'], function (value) {
+            forEach(['config', 'before', 'success', 'error', 'cmd', 'auto', 'service', 'cacheService', 'cacheManager'], function (value) {
                 newFactory[value] = factory[value] ? injector.get(factory[value]) : undefined;
             });
             //primitive values
