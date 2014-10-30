@@ -1,5 +1,5 @@
 <div>
-    <mg-ajax path="/people" mg-route-cache options="jrPeopleIndex">
+    <mg-ajax id="peopleIndex" path="/people" options="jrPeopleIndex">
         <md-content>
             <md-toolbar class="filter md-theme-green">
                 <form ng-submit="index.filter.page=0; index.accept();">
@@ -7,6 +7,9 @@
                         <div flex>
                             <h2>People list</h2>
                             <md-text-float id="search" label="Search:" ng-model="index.filter.searchStr" class="long"> </md-text-float>
+                            
+                            <span ng-show="index.haveCache" style="color: red">Tiene cache</span>
+                            
                         </div>
                         <div layout="vertical" layout-align="center">
                             <md-button class="md-button-raised md-button-colored" style="margin-right: 1em;" ng-click="angular.element('search').focus();" type="submit">Search!</md-button>
@@ -17,7 +20,7 @@
             <div class="md-whiteframe-z1">
                 <div id="list-header" layout="horizontal" layout-align="bottom">
                     <div flex>
-                        <a ng-href="#/create"><md-button class="md-button-raised md-theme-light">Create new Person</md-button></a>
+                        <a ng-href="#/create"><md-button class="md-button-raised md-theme-light" mg-save-cache="#peopleIndex">Create new Person</md-button></a>
                     </div>
                     <div layout="horizontal">
                         <div layout="vertical">

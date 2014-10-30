@@ -31,7 +31,7 @@
 
     controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams', '$interpolate'];
     function controller(scope, attrs, mgFactory, params,interpolate) {
-        var factory = mgFactory(attrs.options, attrs.override, attrs.path, attrs.transform),
+        var factory = mgFactory(attrs.options, attrs.override, attrs.path, attrs.transform, attrs.id),
             self = resolveSelf(),
             forEach = angular.forEach,
             bind = angular.bind,
@@ -40,6 +40,18 @@
 
         this.setSaveCacheOnRouteChange = function (value){
             factory.cacheManager.saveCacheOnRouteChange = value;
+        }
+        
+        this.saveCache = function() {
+            if (!factory.cacheService || !factory.cacheManager)
+                return;
+            factory.cacheManager.saveCache(factory);
+        }
+        
+        this.clearCache = function() {
+            if (!factory.cacheService || !factory.cacheManager)
+                return;
+            factory.cacheManager.clearCache(factory);
         }
         
         if (factory.cacheManager)
@@ -103,7 +115,7 @@
         function restoreCache() {
             if (!factory.cacheService || !factory.cacheManager)
                 return;
-            factory.cacheManager.restoreCache.call(self, factory);
+            factory.cacheManager.restoreCache.call(self, factory);            
         }
 
         function saveCache() {            
@@ -173,19 +185,49 @@
 
     
     function mgRouteCache() {
-
         return {
-            restrict: 'A',            
+            restrict: 'A',
             require: 'mgAjax',
             link: function(scope, element, attrs, mgAjaxCtrl){
-                mgAjaxCtrl.setSaveCacheOnRouteChange(true);                
+                mgAjaxCtrl.setSaveCacheOnRouteChange(true);
             }
-            
         };
     }
     module.directive('mgRouteCache', mgRouteCache);
+
     
-    
+    function ajaxCtrlCallerDDO(attrSelector, fnToCall){
+        return {
+            restrict: 'A',            
+            link: function (scope, element, attrs) {
+                var ajaxElements = [];
+                if (!attrs[attrSelector])
+                    return;
+                
+                [].forEach.call(document.querySelectorAll(attrs[attrSelector]), function (item){
+                    ajaxElements.push(item);
+                });
+                
+                element[0].addEventListener("click", function(){
+                    angular.forEach(ajaxElements, function(item) {
+                        var data = angular.element(item).data();
+                        if (data.$mgAjaxController)
+                            data.$mgAjaxController[fnToCall]();
+                    });
+                });
+            }
+        };
+    }
+
+    function mgSaveCache(){
+        return ajaxCtrlCallerDDO("mgSaveCache", "saveCache");
+    }
+    function mgClearCache(){
+        return ajaxCtrlCallerDDO("mgClearCache", "clearCache");
+    }
+    module.directive('mgSaveCache', mgSaveCache);
+    module.directive('mgClearCache', mgClearCache);
+
 })(angular.module('mgCrud'));
 (function (module, undefined) {
 
@@ -201,18 +243,24 @@
             var cacheData = factory.cacheService.get(factory.cacheKey);
             
             if (cacheData) {
+                factory.self.haveCache = true;
                 angular.forEach(factory.cache, function(cacheItem) {
                     factory.self[cacheItem] = cacheData[cacheItem];
                 });
             }
         }
+        function clearCache(factory)
+        {
+            factory.cacheService.remove(factory.cacheKey);
+        }
         
         return {
-            saveCacheOnRouteChange: true,
+            saveCacheOnRouteChange: false,
             acceptClearCache: true,
             closeSaveCache: false,
             saveCache: saveCache,
-            restoreCache: restoreCache
+            restoreCache: restoreCache,
+            clearCache: clearCache
         };
     }
     module.factory('mgCacheManager', mgCacheManager);
@@ -260,19 +308,19 @@
             if (factory.cacheService && factory.cacheManager && factory.cacheManager.acceptClearCache)
             {
                 factory.cacheManager.saveCacheOnRouteChange = false;
-                factory.cacheService.remove(factory.cacheKey);
+                factory.cacheManager.clearCache(factory);
             }
             
             mgAcceptFactory.accept.call(this, factory);
         }
         function close(factory)
         {
-            if (factory.cacheService && factory.cacheManager && factory.cacheManager.acceptClearCache)
+            if (factory.cacheService && factory.cacheManager && factory.cacheManager.closeSaveCache)
             {
                 factory.cacheManager.saveCache.call(this, factory);
             }
             history.back();
-        }
+        }        
         return {
             accept: accept,
             close: close
@@ -602,7 +650,7 @@
 
             if (factory.cache) {
                 newFactory.cache = parse(factory.cache)();
-                newFactory.cacheKey = factory.cacheKey || location.path() + (factory.as || '');
+                newFactory.cacheKey = factory.cacheKey || location.path() + (factory.as || '') + (factory.id || '');
             }
 
             if (newFactory.service && newFactory.method) {
@@ -611,9 +659,11 @@
            
             return extend(newFactory, resolvePath.resolve(path));
         }
-        return function (options, override, path,transform) {
+        return function (options, override, path,transform, id) {
             var factory = injector.has(options) ? injector.get(options) : parse(options)() || {};
             var override = parse(override)() || {};
+            
+            factory.id = id;
 
             return resolveFactory(angular.extend(factory, override), path, transform);
         };
