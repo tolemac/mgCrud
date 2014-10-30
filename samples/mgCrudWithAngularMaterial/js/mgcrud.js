@@ -45,13 +45,13 @@
         this.saveCache = function() {
             if (!factory.cacheService || !factory.cacheManager)
                 return;
-            factory.cacheManager.saveCache(factory);
+            factory.cacheManager.saveCache.call(self, factory);
         }
         
         this.clearCache = function() {
             if (!factory.cacheService || !factory.cacheManager)
                 return;
-            factory.cacheManager.clearCache(factory);
+            factory.cacheManager.clearCache.call(self, factory);
         }
         
         if (factory.cacheManager)
@@ -118,7 +118,7 @@
             factory.cacheManager.restoreCache.call(self, factory);            
         }
 
-        function saveCache() {            
+        function saveCacheOnRouteChange() {            
             if (!factory.cacheService || !factory.cacheManager || !factory.cacheManager.saveCacheOnRouteChange)
                 return;
             factory.cacheManager.saveCache.call(self, factory);
@@ -153,7 +153,7 @@
         
         function setChangeRouteStartCallback() {
             scope.$on('$routeChangeStart', function (next, current) {
-                saveCache();
+                saveCacheOnRouteChange();
             });
         }
         
@@ -235,7 +235,8 @@
         function saveCache(factory){            
             var cacheObj = {};            
             angular.forEach(factory.cache, function (cacheItem) {
-                cacheObj[cacheItem] = factory.self[cacheItem];
+                cacheObj[cacheItem] = {};
+                angular.extend(cacheObj[cacheItem], factory.self[cacheItem]);
             });
             factory.cacheService.put(factory.cacheKey, cacheObj);
         }
@@ -243,9 +244,11 @@
             var cacheData = factory.cacheService.get(factory.cacheKey);
             
             if (cacheData) {
-                factory.self.haveCache = true;
+                //delete factory.self.cachedModel;
+                //angular.extend(factory.self.cachedModel, cacheData);
                 angular.forEach(factory.cache, function(cacheItem) {
-                    factory.self[cacheItem] = cacheData[cacheItem];
+                    factory.self[cacheItem] = {};
+                    angular.extend(factory.self[cacheItem], cacheData[cacheItem]);
                 });
             }
         }
@@ -305,17 +308,17 @@
     function mgCommandCreate(mgAcceptFactory, history) {
         function accept(factory)
         {
-            if (factory.cacheService && factory.cacheManager && factory.cacheManager.acceptClearCache)
+            if (factory.cacheService && factory.cacheManager && factory.cacheManager.saveCacheOnRouteChange && factory.cacheManager.acceptClearCache )
             {
                 factory.cacheManager.saveCacheOnRouteChange = false;
-                factory.cacheManager.clearCache(factory);
+                factory.cacheManager.clearCache.call(factory.self, factory);
             }
             
             mgAcceptFactory.accept.call(this, factory);
         }
         function close(factory)
         {
-            if (factory.cacheService && factory.cacheManager && factory.cacheManager.closeSaveCache)
+            if (factory.cacheService && factory.cacheManager && factory.cacheManager.saveCacheOnRouteChange && factory.cacheManager.closeSaveCache)
             {
                 factory.cacheManager.saveCache.call(this, factory);
             }
@@ -462,6 +465,8 @@
             else {
                 angular.extend(this.model, response.data || {});
             }            
+            //delete this.receivedModel;
+            //angular.extend(this.receivedModel, this.model || {});
         }
         return {
             assignModel: assignModel
