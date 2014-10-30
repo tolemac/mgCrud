@@ -191,19 +191,18 @@
 
     function mgCacheManager() {        
         function saveCache(factory){            
-            var cacheObj = {};
-            var self = this;
+            var cacheObj = {};            
             angular.forEach(factory.cache, function (cacheItem) {
-                cacheObj[cacheItem] = self[cacheItem];
+                cacheObj[cacheItem] = factory.self[cacheItem];
             });
             factory.cacheService.put(factory.cacheKey, cacheObj);
         }
         function restoreCache(factory){            
             var cacheData = factory.cacheService.get(factory.cacheKey);
-            var self = this;
+            
             if (cacheData) {
                 angular.forEach(factory.cache, function(cacheItem) {
-                    self[cacheItem] = cacheData[cacheItem];
+                    factory.self[cacheItem] = cacheData[cacheItem];
                 });
             }
         }
@@ -235,7 +234,7 @@
             }
         };
     }
-    module.factory('mgCacheFactory', mgCacheFactory);    
+    module.factory('mgCacheFactory', mgCacheFactory);
 
 })(angular.module('mgCrud'));
 
